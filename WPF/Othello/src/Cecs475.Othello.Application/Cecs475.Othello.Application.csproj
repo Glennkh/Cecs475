@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UndoCommand.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -73,6 +74,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OthelloAdvantageConverter.cs" />
+    <Compile Include="OthelloPlayerConverter.cs" />
     <Compile Include="OthelloSquarePlayerConverter.cs" />
     <Compile Include="OthelloView.xaml.cs">
       <DependentUpon>OthelloView.xaml</DependentUpon>

@@ -6,14 +6,27 @@
         xmlns:local="clr-namespace:Cecs475.Othello.Application"
         mc:Ignorable="d"
         Title="Othello!" Width="500">
+    <Window.Resources>
+        <!-- 
+        The ViewModel contains the reference to the OthelloBoard object and makes its properties
+        easier for the View itself to consume
+        -->
+        <local:OthelloViewModel x:Key="vm"/>
+        <local:OthelloAdvantageConverter x:Key="PlayerAdvantage"/>
+        <local:OthelloPlayerConverter x:Key="CurrentPlayerConverter"/>
+    </Window.Resources>
+        
     <DockPanel>
+        <ToolBar DataContext="{Binding ElementName=OthelloView}" DockPanel.Dock="Top">
+            <Button Content="Undo" Command="{Binding UndoCommand, Source={StaticResource vm}}" />
+        </ToolBar>
         <StatusBar Height="30" DockPanel.Dock="Bottom" FontSize="10" DataContext="{Binding ElementName=OthelloView}">
             <WrapPanel>
                 <Label>Score:</Label>
-                <Label Content="{Binding Model.CurrentAdvantage.Advantage}"/>
+                <Label Content="{Binding Model.CurrentAdvantage, Converter={StaticResource PlayerAdvantage}}"/>
+                <Label Content="{Binding Model.CurrentPlayer, Converter={StaticResource CurrentPlayerConverter}}"/>
             </WrapPanel>
         </StatusBar>
         <local:OthelloView x:Name="OthelloView"/>
-        
     </DockPanel>
 </Window>

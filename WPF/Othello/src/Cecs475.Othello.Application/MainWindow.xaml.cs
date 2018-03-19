@@ -21,5 +21,5 @@ namespace Cecs475.Othello.Application {
 		public MainWindow() {
 			InitializeComponent();
 		}
-	}
+    }
 }

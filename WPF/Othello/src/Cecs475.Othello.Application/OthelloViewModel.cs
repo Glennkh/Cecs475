@@ -3,6 +3,7 @@ using System.Linq;
 using Cecs475.Othello.Model;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace Cecs475.Othello.Application {
 	public class OthelloSquare : INotifyPropertyChanged {
@@ -35,9 +36,12 @@ namespace Cecs475.Othello.Application {
 		private void OnPropertyChanged(string name) {
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
+        
+        public UndoCommand UndoCommand { get; set; }
 
-		public OthelloViewModel() {
-			mBoard = new OthelloBoard();
+        public OthelloViewModel() {
+
+            mBoard = new OthelloBoard();
 			mSquares = new ObservableCollection<OthelloSquare>(
 				BoardPosition.GetRectangularPositions(8, 8)
 				.Select(p =>new OthelloSquare() {
@@ -47,7 +51,9 @@ namespace Cecs475.Othello.Application {
 			);
 
 			PossibleMoves = new HashSet<BoardPosition>(mBoard.GetPossibleMoves().Select(m => m.Position));
-		}
+
+            this.UndoCommand = new UndoCommand(this);
+        }
 
 		public void ApplyMove(BoardPosition position) {
 			var possMoves = mBoard.GetPossibleMoves() as IEnumerable<OthelloMove>;
@@ -66,9 +72,18 @@ namespace Cecs475.Othello.Application {
 				i++;
 			}
 			OnPropertyChanged(nameof(CurrentAdvantage));
-		}
+            OnPropertyChanged(nameof(CurrentPlayer));
+        }
 
-		public ObservableCollection<OthelloSquare> Squares {
+        public void UndoLastMove()
+        {
+            mBoard.UndoLastMove();
+            OnPropertyChanged(nameof(CurrentAdvantage));
+            OnPropertyChanged(nameof(CurrentPlayer));
+            OnPropertyChanged(nameof(MoveHistory));
+        }
+
+        public ObservableCollection<OthelloSquare> Squares {
 			get { return mSquares; }
 		}
 
@@ -78,5 +93,10 @@ namespace Cecs475.Othello.Application {
 
 		public GameAdvantage CurrentAdvantage { get { return mBoard.CurrentAdvantage; } }
 
-	}
+        public int CurrentPlayer { get { return mBoard.CurrentPlayer; } }
+
+        public IEnumerable<OthelloMove> MoveHistory { get { return mBoard.MoveHistory; } }
+
+
+    }
 }
