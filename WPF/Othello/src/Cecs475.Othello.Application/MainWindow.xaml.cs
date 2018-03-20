@@ -21,5 +21,10 @@ namespace Cecs475.Othello.Application {
 		public MainWindow() {
 			InitializeComponent();
 		}
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            OthelloView.Model.UndoLastMove();
+        }
     }
 }

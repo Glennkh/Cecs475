@@ -11,14 +11,13 @@
         The ViewModel contains the reference to the OthelloBoard object and makes its properties
         easier for the View itself to consume
         -->
-        <local:OthelloViewModel x:Key="vm"/>
         <local:OthelloAdvantageConverter x:Key="PlayerAdvantage"/>
         <local:OthelloPlayerConverter x:Key="CurrentPlayerConverter"/>
     </Window.Resources>
         
     <DockPanel>
         <ToolBar DataContext="{Binding ElementName=OthelloView}" DockPanel.Dock="Top">
-            <Button Content="Undo" Command="{Binding UndoCommand, Source={StaticResource vm}}" />
+            <Button Content="Undo" IsEnabled="{Binding Model.ButtonIsEnabled}" Click="Button_Click" />
         </ToolBar>
         <StatusBar Height="30" DockPanel.Dock="Bottom" FontSize="10" DataContext="{Binding ElementName=OthelloView}">
             <WrapPanel>

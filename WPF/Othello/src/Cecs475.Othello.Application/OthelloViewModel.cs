@@ -28,74 +28,84 @@ namespace Cecs475.Othello.Application {
 		}
 	}
 
-	public class OthelloViewModel : INotifyPropertyChanged {
-		private OthelloBoard mBoard;
-		private ObservableCollection<OthelloSquare> mSquares;
+    public class OthelloViewModel : INotifyPropertyChanged {
+        private OthelloBoard mBoard;
+        private ObservableCollection<OthelloSquare> mSquares;
 
-		public event PropertyChangedEventHandler PropertyChanged;
-		private void OnPropertyChanged(string name) {
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
-        
-        public UndoCommand UndoCommand { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged(string name) {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
 
         public OthelloViewModel() {
 
             mBoard = new OthelloBoard();
-			mSquares = new ObservableCollection<OthelloSquare>(
-				BoardPosition.GetRectangularPositions(8, 8)
-				.Select(p =>new OthelloSquare() {
-					Position = p,
-					Player = mBoard.GetPlayerAtPosition(p)
-				})
-			);
+            mSquares = new ObservableCollection<OthelloSquare>(
+                BoardPosition.GetRectangularPositions(8, 8)
+                .Select(p => new OthelloSquare() {
+                    Position = p,
+                    Player = mBoard.GetPlayerAtPosition(p)
+                })
+            );
 
-			PossibleMoves = new HashSet<BoardPosition>(mBoard.GetPossibleMoves().Select(m => m.Position));
+            PossibleMoves = new HashSet<BoardPosition>(mBoard.GetPossibleMoves().Select(m => m.Position));
 
-            this.UndoCommand = new UndoCommand(this);
         }
 
-		public void ApplyMove(BoardPosition position) {
-			var possMoves = mBoard.GetPossibleMoves() as IEnumerable<OthelloMove>;
-			foreach (var move in possMoves) {
-				if (move.Position.Equals(position)) {
-					mBoard.ApplyMove(move);
-					break;
-				}
-			}
+        public void ApplyMove(BoardPosition position) {
+            var possMoves = mBoard.GetPossibleMoves() as IEnumerable<OthelloMove>;
+            foreach (var move in possMoves) {
+                if (move.Position.Equals(position)) {
+                    mBoard.ApplyMove(move);
+                    break;
+                }
+            }
 
-			PossibleMoves = new HashSet<BoardPosition>(mBoard.GetPossibleMoves().Select(m => m.Position));
-			var newSquares = BoardPosition.GetRectangularPositions(8, 8);
-			int i = 0;
-			foreach (var pos in newSquares) {
-				mSquares[i].Player = mBoard.GetPlayerAtPosition(pos);
-				i++;
-			}
-			OnPropertyChanged(nameof(CurrentAdvantage));
+            PossibleMoves = new HashSet<BoardPosition>(mBoard.GetPossibleMoves().Select(m => m.Position));
+            var newSquares = BoardPosition.GetRectangularPositions(8, 8);
+            int i = 0;
+            foreach (var pos in newSquares) {
+                mSquares[i].Player = mBoard.GetPlayerAtPosition(pos);
+                i++;
+            }
+            OnPropertyChanged(nameof(CurrentAdvantage));
             OnPropertyChanged(nameof(CurrentPlayer));
+            OnPropertyChanged(nameof(ButtonIsEnabled));
         }
 
         public void UndoLastMove()
         {
             mBoard.UndoLastMove();
+
+            PossibleMoves = new HashSet<BoardPosition>(mBoard.GetPossibleMoves().Select(m => m.Position));
+
+            var newSquares = BoardPosition.GetRectangularPositions(8, 8);
+            int i = 0;
+            foreach (var pos in newSquares)
+            {
+                mSquares[i].Player = mBoard.GetPlayerAtPosition(pos);
+                i++;
+            }
+
             OnPropertyChanged(nameof(CurrentAdvantage));
             OnPropertyChanged(nameof(CurrentPlayer));
-            OnPropertyChanged(nameof(MoveHistory));
+            OnPropertyChanged(nameof(ButtonIsEnabled));
         }
 
         public ObservableCollection<OthelloSquare> Squares {
-			get { return mSquares; }
-		}
+            get { return mSquares; }
+        }
 
-		public HashSet<BoardPosition> PossibleMoves {
-			get; private set;
-		}
+        public HashSet<BoardPosition> PossibleMoves {
+            get; private set;
+        }
 
-		public GameAdvantage CurrentAdvantage { get { return mBoard.CurrentAdvantage; } }
+        public GameAdvantage CurrentAdvantage { get { return mBoard.CurrentAdvantage; } }
 
         public int CurrentPlayer { get { return mBoard.CurrentPlayer; } }
 
-        public IEnumerable<OthelloMove> MoveHistory { get { return mBoard.MoveHistory; } }
+        public bool ButtonIsEnabled { get { return mBoard.MoveHistory.Count() > 0; } }
 
 
     }
